@@ -11,7 +11,7 @@ paginate     = 10
   dateformNumTime = "2006-01-02 15:04"
 
   # Subtitle for home
-  homeSubtitle = "Learner of Software Engineering and occasional code janitor"
+  homeSubtitle = "Backend Software Engineer"
 
   # Set disableReadOtherPosts to true in order to hide the links to other posts.
   disableReadOtherPosts = false
@@ -20,9 +20,17 @@ paginate     = 10
   enableSharingButtons = true
 
   # Metadata mostly used in document's head
-  description = "My new homepage or blog"
+  description = "Personal website and blog"
   keywords = "homepage, blog"
   images = [""]
+
+[[params.social]]
+  name = "github"
+  url = "https://github.com/brandonyeoxg"
+
+[[params.social]]
+  name = "linkedin"
+  url = "https://www.linkedin.com/in/brandon-yeo-xg/"
 
 [taxonomies]
     category = "blog"
@@ -38,7 +46,7 @@ paginate     = 10
     readOtherPosts = "Read other posts"
 
     [languages.en.params.logo]
-      logoText = "Hi I'm Brandon"
+      logoText = "$ cd /home/"
       logoHomeLink = "/"
     # or
     #
