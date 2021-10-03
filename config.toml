@@ -33,7 +33,7 @@ paginate     = 10
   url = "https://www.linkedin.com/in/brandon-yeo-xg/"
 
 [taxonomies]
-    category = "blog"
+    # category = "blog"
     tag      = "tags"
     series   = "series"
 
