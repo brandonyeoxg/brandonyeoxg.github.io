@@ -2,6 +2,7 @@
 title: "About"
 date: 2021-09-12T18:41:55+08:00
 draft: true
+type: "page"
 ---
 
 Backend software engineer at Grab with over two years of experience building scalable distributed systems on the cloud.
