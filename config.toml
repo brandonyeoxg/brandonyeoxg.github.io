@@ -1,60 +1,59 @@
-baseurl      = "https://brandonyeoxg.github.io/"
-title        = "Hi I'm Brandon"
-languageCode = "en-us"
-theme        = "hello-friend-ng"
-paginate     = 10
+baseurl = "https://brandonyeoxg.github.io/"
+title = "Hi I'm Brandon"
+theme = "hugo-coder"
+languagecode = "en"
+defaultcontentlanguage = "en"
+
+paginate = 20
+
+pygmentsstyle = "bw"
+pygmentscodefences = true
+pygmentscodefencesguesssyntax = true
 
 [params]
-  dateform        = "Jan 2, 2006"
-  dateformShort   = "Jan 2"
-  dateformNum     = "2006-01-02"
-  dateformNumTime = "2006-01-02 15:04"
+  author = "Brandon Yeo"
+  info = "Backend Software Engineer"
+  description = "Brandon Yeo's personal website"
+  keywords = "blog,software,engineering,personal"
+  avatarurl = "images/avatar.jpg"
 
-  # Subtitle for home
-  homeSubtitle = "Backend Software Engineer"
+  favicon_32 = "/images/favicon-32x32.png"
+  favicon_16 = "/images/favicon-16x16.png"
 
-  # Set disableReadOtherPosts to true in order to hide the links to other posts.
-  disableReadOtherPosts = false
+  hideFooter = true
+  hideCredits = false
+  hideCopyright = false
+  since = 2021
 
-  # Enable sharing buttons, if you like
-  enableSharingButtons = true
+  enableTwemoji = true
 
-  # Metadata mostly used in document's head
-  description = "Personal website and blog"
-  keywords = "homepage, blog"
-  images = [""]
-
-[[params.social]]
-  name = "github"
-  url = "https://github.com/brandonyeoxg"
-
-[[params.social]]
-  name = "linkedin"
-  url = "https://www.linkedin.com/in/brandon-yeo-xg/"
+  colorScheme = "auto"
+  hidecolorschemetoggle = false
 
 [taxonomies]
-    # category = "blog"
-    tag      = "tags"
-    series   = "series"
+  category = "categories"
+  series = "series"
+  tag = "tags"
+  author = "authors"
 
-[languages]
-  [languages.en]
-    title = "Hi I'm Brandon"
-    subtitle = ""
-    keywords = ""
-    copyright = '<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
-    readOtherPosts = "Read other posts"
+# Social links
+[[params.social]]
+  name = "Github"
+  icon = "fa fa-github fa-2x"
+  weight = 1
+  url = "https://github.com/brandonyeoxg"
+[[params.social]]
+  name = "LinkedIn"
+  icon = "fa fa-linkedin fa-2x"
+  weight = 2
+  url = "https://www.linkedin.com/in/brandon-yeo-xg"
 
-    [languages.en.params.logo]
-      logoText = "$ cd /home/"
-      logoHomeLink = "/"
-    # or
-    #
-    # path = "/img/your-example-logo.svg"
-    # alt = "Your example logo alt text"
-
-  # And you can even create generic menu
-  [[menu.main]]
-    identifier = "about"
-    name       = "About"
-    url        = "/about"
+# Menu links
+[[menu.main]]
+  name = "About"
+  weight = 1
+  url = "about/"
+[[menu.main]]
+  name = "Blog"
+  weight = 2
+  url  = "posts/"
