@@ -1,7 +1,7 @@
 ---
 title: "Hello World"
 date: 2021-11-07T14:33:59+08:00
-draft: true
+draft: false
 ---
 ![hello world](/images/hello_world_cover.png)
 
