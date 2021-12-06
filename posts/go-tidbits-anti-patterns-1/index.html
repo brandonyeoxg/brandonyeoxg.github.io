@@ -1,0 +1,155 @@
+<!doctype html><html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=content-language content="en">
+<meta name=color-scheme content="light dark">
+<meta name=author content="Brandon Yeo">
+<meta name=description content="Sharing of anitpatterns in golang">
+<meta name=keywords content="blog,software,engineering,personal">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="GO Tidbits Antipattern Part 1">
+<meta name=twitter:description content="Sharing of anitpatterns in golang">
+<meta property="og:title" content="GO Tidbits Antipattern Part 1">
+<meta property="og:description" content="Sharing of anitpatterns in golang">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://brandonyeoxg.github.io/posts/go-tidbits-anti-patterns-1/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-12-05T16:14:50+08:00">
+<meta property="article:modified_time" content="2021-12-05T16:14:50+08:00">
+<title>
+GO Tidbits Antipattern Part 1 · Hi I'm Brandon
+</title>
+<link rel=canonical href=https://brandonyeoxg.github.io/posts/go-tidbits-anti-patterns-1/>
+<link rel=preload href="/fonts/forkawesome-webfont.woff2?v=1.2.0" as=font type=font/woff2 crossorigin>
+<link rel=stylesheet href=/css/coder.min.d9fddbffe6f27e69985dc5fe0471cdb0e57fbf4775714bc3d847accb08f4a1f6.css integrity="sha256-2f3b/+byfmmYXcX+BHHNsOV/v0d1cUvD2Eesywj0ofY=" crossorigin=anonymous media=screen>
+<link rel=stylesheet href=/css/coder-dark.min.aa883b9ce35a8ff4a2a5008619005175e842bb18a8a9f9cc2bbcf44dab2d91fa.css integrity="sha256-qog7nONaj/SipQCGGQBRdehCuxioqfnMK7z0Tastkfo=" crossorigin=anonymous media=screen>
+<link rel=icon type=image/png href=/images/favicon-32x32.png sizes=32x32>
+<link rel=icon type=image/png href=/images/favicon-16x16.png sizes=16x16>
+<link rel=apple-touch-icon href=/images/apple-touch-icon.png>
+<link rel=apple-touch-icon sizes=180x180 href=/images/apple-touch-icon.png>
+<meta name=generator content="Hugo 0.89.4">
+</head>
+<body class="preload-transitions colorscheme-auto">
+<div class=float-container>
+<a id=dark-mode-toggle class=colorscheme-toggle>
+<i class="fa fa-adjust fa-fw" aria-hidden=true></i>
+</a>
+</div>
+<main class=wrapper>
+<nav class=navigation>
+<section class=container>
+<a class=navigation-title href=/>
+Hi I'm Brandon
+</a>
+<input type=checkbox id=menu-toggle>
+<label class="menu-button float-right" for=menu-toggle>
+<i class="fa fa-bars fa-fw" aria-hidden=true></i>
+</label>
+<ul class=navigation-list>
+<li class=navigation-item>
+<a class=navigation-link href=/about/>About</a>
+</li>
+<li class=navigation-item>
+<a class=navigation-link href=/posts/>Blog</a>
+</li>
+</ul>
+</section>
+</nav>
+<div class=content>
+<section class="container post">
+<article>
+<header>
+<div class=post-title>
+<h1 class=title>
+<a class=title-link href=https://brandonyeoxg.github.io/posts/go-tidbits-anti-patterns-1/>
+GO Tidbits Antipattern Part 1
+</a>
+</h1>
+</div>
+<div class=post-meta>
+<div class=date>
+<span class=posted-on>
+<i class="fa fa-calendar" aria-hidden=true></i>
+<time datetime=2021-12-05T16:14:50+08:00>
+December 5, 2021
+</time>
+</span>
+<span class=reading-time>
+<i class="fa fa-clock-o" aria-hidden=true></i>
+3-minute read
+</span>
+</div>
+<div class=categories>
+<i class="fa fa-folder" aria-hidden=true></i>
+<a href=/categories/golang/>golang</a></div>
+<div class=tags>
+<i class="fa fa-tag" aria-hidden=true></i>
+<span class=tag>
+<a href=/tags/golang/>golang</a>
+</span>
+<span class=separator>•</span>
+<span class=tag>
+<a href=/tags/tidbits/>tidbits</a>
+</span>
+<span class=separator>•</span>
+<span class=tag>
+<a href=/tags/antipatterns/>antipatterns</a>
+</span></div>
+</div>
+</header>
+<div>
+<p>Many engineers that I&rsquo;ve come across in my journey often mention that software engineering is a craft. When I read engineering books such as <a href=https://www.amazon.com/Code-Complete-Practical-Handbook-Construction/dp/0735619670>Code Complete</a>, the concept of craftmenship and the gathering of &ldquo;tools&rdquo; for the &ldquo;toolbox&rdquo; were highlighted several times. That got me curious on what sort of &ldquo;tools&rdquo; I could gather.</p>
+<p>In software engineering there is the concept of design patterns. These patterns. broadly speaking, are commonly used solutions to tackle problem spaces that they were design for. Suffice to say any engineer worth their salt would have come across such patterns; <strong>factory</strong>, <strong>strategy</strong> or <strong>command</strong> just to name a few.</p>
+<p>When a design pattern is implemented for problems it is not meant to solve, there is bound to be code smell. This makes the codebase harder to maintain and might even introduce unintended behaviours. When this arises, the pattern is now considered an antipattern.</p>
+<p>An antipattern is an ineffective and counterproductive practice or application of solutions.
+Knowing how antipatterns look like should provide the knowledge to avoid them and thus make our code cleaner and simpler.</p>
+<p>This antipattern is the &ldquo;tool&rdquo; that I would like to include in the engineering &ldquo;toolbox&rdquo; of mine. I will be starting a series dedicated to documenting antipatterns as a way for me to document the antipatterns that I&rsquo;ve come across, learning along the way and I hope it will help you learn as well.</p>
+<blockquote>
+<p>The language that we will be covering is for GO, however I do believe that the knowledge should be tranferable to other languages as well.</p>
+</blockquote>
+<p>Let&rsquo;s start off with the simplest antipattern to spot: boat anchor.</p>
+<p>Boat anchor a is piece of code that is no longer relevant in the code but is still left if there in hopes that there might be &ldquo;some use&rdquo; for it later on. As years go by and engineers come and go, the belief that this has &ldquo;some use&rdquo; gets lost. Newer engineers are reluctant to change and choose to work around these boat acnhor, furthering bloating the code base.</p>
+<p>One such example:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=color:#66d9ef>if</span> <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>ExperimentA</span>() {
+  <span style=color:#a6e22e>doOperationA</span>()
+}
+</code></pre></div><p>This is all well and good, however experiment A was a success and s currently used in the business flow.</p>
+<p>A new engineer who is helping to add feature might look at this and think that this is probably something that is important. They might ask their experienced colleagues (that is if they have the relevant context) but more likely than now, they would work around this in hopes of not causing any business outage.</p>
+<p>They might probably do something like:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=color:#66d9ef>if</span> <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>ExperimentA</span>() {
+  <span style=color:#a6e22e>doOperationA</span>()
+}
+
+<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>ExperimentA</span>() <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>RolloutNewFeatureA</span>() {
+  <span style=color:#a6e22e>doNewFeatureA</span>()
+}
+</code></pre></div><p>Notice the code bloating on the above? It is clear that the code will become harder to maintain in the feature if this keeps out.</p>
+<p>Contrasting this to the above:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=color:#a6e22e>doOperationA</span>()
+
+<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>RolloutNewFeatureA</span>() {
+  <span style=color:#a6e22e>doNewFeatureA</span>()
+}
+</code></pre></div><p>Which do you think is more maintainable? The code looks much better by simply cleaning up after ourselves when we successfully finished rolling out a feature or an experiment.</p>
+<p>As the saying goes <strong>less</strong> is <strong>more</strong>.</p>
+</div>
+<footer>
+<section class=see-also>
+</section>
+</footer>
+</article>
+</section>
+</div>
+<footer class=footer>
+<section class=container>
+©
+2021
+Brandon Yeo
+·
+Powered by <a href=https://gohugo.io/>Hugo</a> & <a href=https://github.com/luizdepra/hugo-coder/>Coder</a>.
+</section>
+</footer>
+</main>
+<script src=/js/coder.min.03b17769f4f91ae35667e1f2a1ca8c16f50562576cf90ff32b3179926914daa5.js integrity="sha256-A7F3afT5GuNWZ+HyocqMFvUFYlds+Q/zKzF5kmkU2qU="></script>
+</body>
+</html>
