@@ -1,5 +1,5 @@
 +++
-draft = true
+draft = false
 date = 2021-12-12T20:27:55+08:00
 title = "GOtchas Part 1"
 description = "Covering gotchas in GO"
