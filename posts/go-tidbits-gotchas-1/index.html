@@ -1,0 +1,222 @@
+<!doctype html><html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=content-language content="en">
+<meta name=color-scheme content="light dark">
+<meta name=author content="Brandon Yeo">
+<meta name=description content="Covering gotchas in GO">
+<meta name=keywords content="blog,software,engineering,personal">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="GOtchas Part 1">
+<meta name=twitter:description content="Covering gotchas in GO">
+<meta property="og:title" content="GOtchas Part 1">
+<meta property="og:description" content="Covering gotchas in GO">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://brandonyeoxg.github.io/posts/go-tidbits-gotchas-1/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-12-12T20:27:55+08:00">
+<meta property="article:modified_time" content="2021-12-12T20:27:55+08:00">
+<meta property="og:see_also" content="https://brandonyeoxg.github.io/posts/go-tidbits-anti-patterns-1/">
+<title>
+GOtchas Part 1 · Hi I'm Brandon
+</title>
+<link rel=canonical href=https://brandonyeoxg.github.io/posts/go-tidbits-gotchas-1/>
+<link rel=preload href="/fonts/forkawesome-webfont.woff2?v=1.2.0" as=font type=font/woff2 crossorigin>
+<link rel=stylesheet href=/css/coder.min.d9fddbffe6f27e69985dc5fe0471cdb0e57fbf4775714bc3d847accb08f4a1f6.css integrity="sha256-2f3b/+byfmmYXcX+BHHNsOV/v0d1cUvD2Eesywj0ofY=" crossorigin=anonymous media=screen>
+<link rel=stylesheet href=/css/coder-dark.min.aa883b9ce35a8ff4a2a5008619005175e842bb18a8a9f9cc2bbcf44dab2d91fa.css integrity="sha256-qog7nONaj/SipQCGGQBRdehCuxioqfnMK7z0Tastkfo=" crossorigin=anonymous media=screen>
+<link rel=icon type=image/png href=/images/favicon-32x32.png sizes=32x32>
+<link rel=icon type=image/png href=/images/favicon-16x16.png sizes=16x16>
+<link rel=apple-touch-icon href=/images/apple-touch-icon.png>
+<link rel=apple-touch-icon sizes=180x180 href=/images/apple-touch-icon.png>
+<meta name=generator content="Hugo 0.90.1">
+</head>
+<body class="preload-transitions colorscheme-auto">
+<div class=float-container>
+<a id=dark-mode-toggle class=colorscheme-toggle>
+<i class="fa fa-adjust fa-fw" aria-hidden=true></i>
+</a>
+</div>
+<main class=wrapper>
+<nav class=navigation>
+<section class=container>
+<a class=navigation-title href=/>
+Hi I'm Brandon
+</a>
+<input type=checkbox id=menu-toggle>
+<label class="menu-button float-right" for=menu-toggle>
+<i class="fa fa-bars fa-fw" aria-hidden=true></i>
+</label>
+<ul class=navigation-list>
+<li class=navigation-item>
+<a class=navigation-link href=/about/>About</a>
+</li>
+<li class=navigation-item>
+<a class=navigation-link href=/posts/>Blog</a>
+</li>
+</ul>
+</section>
+</nav>
+<div class=content>
+<section class="container post">
+<article>
+<header>
+<div class=post-title>
+<h1 class=title>
+<a class=title-link href=https://brandonyeoxg.github.io/posts/go-tidbits-gotchas-1/>
+GOtchas Part 1
+</a>
+</h1>
+</div>
+<div class=post-meta>
+<div class=date>
+<span class=posted-on>
+<i class="fa fa-calendar" aria-hidden=true></i>
+<time datetime=2021-12-12T20:27:55+08:00>
+December 12, 2021
+</time>
+</span>
+<span class=reading-time>
+<i class="fa fa-clock-o" aria-hidden=true></i>
+4-minute read
+</span>
+</div>
+<div class=categories>
+<i class="fa fa-folder" aria-hidden=true></i>
+<a href=/categories/golang/>golang</a></div>
+<div class=tags>
+<i class="fa fa-tag" aria-hidden=true></i>
+<span class=tag>
+<a href=/tags/golang/>golang</a>
+</span>
+<span class=separator>•</span>
+<span class=tag>
+<a href=/tags/tidbits/>tidbits</a>
+</span>
+<span class=separator>•</span>
+<span class=tag>
+<a href=/tags/gotchas/>gotchas</a>
+</span></div>
+</div>
+</header>
+<div>
+<blockquote>
+<p>In order for me to build the habit of posting weekly content, hopefully every sunday, I would need to reduce the scope of what I will be sharing. Hopefully this reduction in scope will make me motivated habitually of post useful software engineering content.</p>
+</blockquote>
+<p>One of the common gotchas in GO relates to the use of slices. In gist a slice is a dynamically sized array. Within the concrete implementation of a slice are 3 fields:</p>
+<ol>
+<li>Pointer to first element of the underlying array holding the values</li>
+<li>The length of the slice</li>
+<li>The capacity of the slice</li>
+</ol>
+<p>As mentioned since a slice is dynamically sized, we can append to a slice using the <code>append([]T s, ...T)</code> in built function.</p>
+<blockquote>
+<p>NOTE: In this artical T represents the type</p>
+</blockquote>
+<p>Furthermore we can initialise a slice using the <code>make([]T s, len, cap)</code> in built function.</p>
+<p>A gotcha however arises from these 2 functions, let&rsquo;s take a deeper look.</p>
+<p>Consider an example of adding users to a list, we can do the following:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=color:#a6e22e>users</span> <span style=color:#f92672>:=</span> []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;alice&#34;</span>, <span style=color:#e6db74>&#34;bob&#34;</span>, <span style=color:#e6db74>&#34;charlie&#34;</span>, <span style=color:#e6db74>&#34;dan&#34;</span>, <span style=color:#e6db74>&#34;erica&#34;</span>}
+</code></pre></div><p>Now consider that we would like filter out these users maybe in a whitelist:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=color:#a6e22e>users</span> <span style=color:#f92672>:=</span> []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;alice&#34;</span>, <span style=color:#e6db74>&#34;bob&#34;</span>, <span style=color:#e6db74>&#34;charlie&#34;</span>, <span style=color:#e6db74>&#34;dan&#34;</span>, <span style=color:#e6db74>&#34;erica&#34;</span>}
+<span style=color:#75715e>// Whitelist users: &#34;alice&#34;, &#34;bob&#34; and &#34;charlie&#34;.
+</span><span style=color:#75715e></span>
+<span style=color:#75715e>// Approach 1 (in place)
+</span><span style=color:#75715e></span><span style=color:#66d9ef>for</span> <span style=color:#a6e22e>i</span> <span style=color:#f92672>:=</span> <span style=color:#ae81ff>0</span>; <span style=color:#a6e22e>i</span> &lt; len(<span style=color:#a6e22e>users</span>); {
+  <span style=color:#66d9ef>if</span> !<span style=color:#a6e22e>isWhitelisted</span>(<span style=color:#a6e22e>users</span>[<span style=color:#a6e22e>i</span>]) {
+    <span style=color:#a6e22e>users</span> = append(<span style=color:#a6e22e>users</span>[:<span style=color:#a6e22e>i</span>], <span style=color:#a6e22e>users</span>[<span style=color:#a6e22e>i</span><span style=color:#f92672>+</span><span style=color:#ae81ff>1</span>:]<span style=color:#f92672>...</span>)
+    <span style=color:#66d9ef>continue</span>
+  }
+  <span style=color:#a6e22e>i</span><span style=color:#f92672>++</span>
+}
+
+<span style=color:#75715e>// Approach 2 immutable
+</span><span style=color:#75715e></span><span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>string</span>)
+<span style=color:#75715e>// or wUsers := []string{}
+</span><span style=color:#75715e></span>
+
+<span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>u</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>users</span> {
+  <span style=color:#66d9ef>if</span> !<span style=color:#a6e22e>isWhitelisted</span>(<span style=color:#a6e22e>u</span>) {
+    <span style=color:#66d9ef>continue</span>
+  }
+  <span style=color:#a6e22e>wUsers</span> = append(<span style=color:#a6e22e>wUsers</span>, <span style=color:#a6e22e>u</span>)
+}
+
+</code></pre></div><p>Both approaches are well and good (I prefer approach 2), but can we do better? What if we preallocate memory so that our slice does not have to double in size whenever its underlying array size cannot hold the incoming value. We can make use of <code>make([]T s, len, cap)</code> touched briefly above for this:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=color:#a6e22e>users</span> <span style=color:#f92672>:=</span> []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;alice&#34;</span>, <span style=color:#e6db74>&#34;bob&#34;</span>, <span style=color:#e6db74>&#34;charlie&#34;</span>, <span style=color:#e6db74>&#34;dan&#34;</span>, <span style=color:#e6db74>&#34;erica&#34;</span>}
+<span style=color:#75715e>// Whitelist users: &#34;alice&#34;, &#34;bob&#34; and &#34;charlie&#34;.
+</span><span style=color:#75715e></span>
+<span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>string</span>, len(<span style=color:#a6e22e>users</span>))
+
+<span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>u</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>users</span> {
+  <span style=color:#66d9ef>if</span> !<span style=color:#a6e22e>isWhitelisted</span>(<span style=color:#a6e22e>u</span>) {
+    <span style=color:#66d9ef>continue</span>
+  }
+  <span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> append(<span style=color:#a6e22e>users</span>, <span style=color:#a6e22e>u</span>)
+}
+</code></pre></div><p>There we&rsquo;re done right? We have our final whitelisted users? No, no we don&rsquo;t. The output of the above code will be:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=color:#a6e22e>users</span> <span style=color:#f92672>:=</span> []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;alice&#34;</span>, <span style=color:#e6db74>&#34;bob&#34;</span>, <span style=color:#e6db74>&#34;charlie&#34;</span>, <span style=color:#e6db74>&#34;dan&#34;</span>, <span style=color:#e6db74>&#34;erica&#34;</span>}
+<span style=color:#75715e>// Whitelist users: &#34;alice&#34;, &#34;bob&#34; and &#34;charlie&#34;.
+</span><span style=color:#75715e></span>
+<span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>string</span>, len(<span style=color:#a6e22e>users</span>))
+
+<span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>u</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>users</span> {
+  <span style=color:#66d9ef>if</span> !<span style=color:#a6e22e>isWhitelisted</span>(<span style=color:#a6e22e>u</span>) {
+    <span style=color:#66d9ef>continue</span>
+  }
+  <span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> append(<span style=color:#a6e22e>users</span>, <span style=color:#a6e22e>u</span>)
+}
+
+<span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;wUsers&#34;</span>, <span style=color:#a6e22e>wUsers</span>, <span style=color:#e6db74>&#34;len&#34;</span>, len(<span style=color:#a6e22e>wUsers</span>), <span style=color:#e6db74>&#34;cap&#34;</span>, cap(<span style=color:#a6e22e>wUsers</span>)) <span style=color:#75715e>// wUsers [   alice bob charlie] len 6 cap 6
+</span></code></pre></div><p>So what actually happened? Simply put it was the confusion between what is a length and capacity in a slice. When we did:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>string</span>, len(<span style=color:#a6e22e>users</span>))
+</code></pre></div><p>What we did was to assign len and cap of the slice to <code>len(users)</code>. The length of the slice is what <code>append([]T s, ...T)</code> will use to figure out which index the new value should be slotted into the underlying array of the slice. So when we called append in the first iteration, we actually had to increase the size of the underlying array and placed the first element of <code>users</code> into the 4th index of <code>wUsers</code>. This carried on for the rest of the whitelisted users to be added.</p>
+<p>The solution would be as follows:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=color:#a6e22e>users</span> <span style=color:#f92672>:=</span> []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;alice&#34;</span>, <span style=color:#e6db74>&#34;bob&#34;</span>, <span style=color:#e6db74>&#34;charlie&#34;</span>, <span style=color:#e6db74>&#34;dan&#34;</span>, <span style=color:#e6db74>&#34;erica&#34;</span>}
+<span style=color:#75715e>// Whitelist users: &#34;alice&#34;, &#34;bob&#34; and &#34;charlie&#34;.
+</span><span style=color:#75715e></span>
+<span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>string</span>, <span style=color:#ae81ff>0</span>, len(<span style=color:#a6e22e>users</span>)) <span style=color:#75715e>// Here we set the len == 0 and cap == len(users)
+</span><span style=color:#75715e></span>
+<span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>u</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>users</span> {
+  <span style=color:#66d9ef>if</span> !<span style=color:#a6e22e>isWhitelisted</span>(<span style=color:#a6e22e>u</span>) {
+    <span style=color:#66d9ef>continue</span>
+  }
+  <span style=color:#a6e22e>wUsers</span> <span style=color:#f92672>:=</span> append(<span style=color:#a6e22e>wUsers</span>, <span style=color:#a6e22e>u</span>)
+}
+
+<span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;wUsers&#34;</span>, <span style=color:#a6e22e>wUsers</span>, <span style=color:#e6db74>&#34;len&#34;</span>, len(<span style=color:#a6e22e>wUsers</span>), <span style=color:#e6db74>&#34;cap&#34;</span>, cap(<span style=color:#a6e22e>wUsers</span>)) <span style=color:#75715e>// wUsers [a b c] len 3 cap 3
+</span></code></pre></div><p>Fun fact, I made this same exact noob mistake which introduced a bug in staging and suffice to say I learnt from this embarrassing mistake.</p>
+<p>I hope this was as informative to you as it was me. Thank you for making this far!</p>
+</div>
+<footer>
+<section class=see-also>
+<h3 id=see-also-in-golang>
+See also in golang
+<a class=heading-link href=#see-also-in-golang>
+<i class="fa fa-link" aria-hidden=true></i>
+</a>
+</h3>
+<nav>
+<ul>
+<li>
+<a href=/posts/go-tidbits-anti-patterns-1/>GO Tidbits Antipattern Part 1</a>
+</li>
+</ul>
+</nav>
+</section>
+</footer>
+</article>
+</section>
+</div>
+<footer class=footer>
+<section class=container>
+©
+2021
+Brandon Yeo
+·
+Powered by <a href=https://gohugo.io/>Hugo</a> & <a href=https://github.com/luizdepra/hugo-coder/>Coder</a>.
+</section>
+</footer>
+</main>
+<script src=/js/coder.min.03b17769f4f91ae35667e1f2a1ca8c16f50562576cf90ff32b3179926914daa5.js integrity="sha256-A7F3afT5GuNWZ+HyocqMFvUFYlds+Q/zKzF5kmkU2qU="></script>
+</body>
+</html>
